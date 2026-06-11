@@ -30,6 +30,7 @@ export function Header() {
           href="/panier"
           className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-rose transition-colors"
           aria-label="Panier"
+          suppressHydrationWarning
         >
           <ShoppingBag size={22} className="text-on-surface" strokeWidth={1.5} />
           {mounted && count > 0 && (
