@@ -3,10 +3,17 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, User, MapPin } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCart } from '@/hooks/useCart'
 import { supabase } from '@/lib/supabase/client'
+
+const PAYMENT_LOGOS = [
+  { name: 'MTN Mobile Money', src: '/moyen-paiement/MTN-CI.jpg' },
+  { name: 'Orange Money',     src: '/moyen-paiement/Orange-money.png' },
+  { name: 'Wave',             src: '/moyen-paiement/wave.png' },
+]
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -149,16 +156,27 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Payment methods info */}
-        <div className="bg-tertiary-container/40 rounded-xl p-4">
-          <p className="font-sans text-xs text-on-surface-variant uppercase tracking-widest mb-2">
+        {/* Payment methods */}
+        <div className="bg-tertiary-container/30 rounded-xl p-4">
+          <p className="font-sans text-xs text-on-surface-variant uppercase tracking-widest mb-3">
             Modes de paiement acceptés
           </p>
-          <div className="flex gap-3 flex-wrap">
-            {['MTN Mobile Money', 'Orange Money', 'Wave'].map((m) => (
-              <span key={m} className="rounded-full bg-surface px-3 py-1 font-sans text-xs font-medium text-on-surface">
-                {m}
-              </span>
+          <div className="flex gap-3 items-center">
+            {PAYMENT_LOGOS.map(({ name, src }) => (
+              <div
+                key={name}
+                className="bg-white rounded-xl p-2 shadow-sm flex items-center justify-center"
+                style={{ width: 64, height: 40 }}
+                title={name}
+              >
+                <Image
+                  src={src}
+                  alt={name}
+                  width={52}
+                  height={28}
+                  className="object-contain"
+                />
+              </div>
             ))}
           </div>
         </div>
