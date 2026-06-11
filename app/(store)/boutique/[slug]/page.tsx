@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Heart, ShoppingBag, MessageCircle, ChevronLeft, ChevronRight, Zap } from 'lucide-react'
+import { ArrowLeft, Heart, ShoppingBag, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useProduct } from '@/hooks/useProducts'
 import { useCart } from '@/hooks/useCart'
 import { useCartAnim } from '@/components/ui/CartFlyAnimation'
@@ -69,6 +69,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       size: selectedSize || 'Unique',
       qty: 1,
       slug: product!.slug,
+      wavePaymentUrl: product!.wave_payment_url ?? undefined,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -221,18 +222,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           <MessageCircle size={16} strokeWidth={1.5} />
           <span className="hidden sm:inline">WhatsApp</span>
         </Button>
-
-        {product.wave_payment_url && (
-          <a
-            href={product.wave_payment_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-shrink-0 flex items-center gap-1.5 rounded-xl bg-[#1DC3C3] text-white px-4 py-2 font-sans font-semibold text-sm active:scale-95 transition-transform"
-          >
-            <Zap size={15} strokeWidth={2} />
-            Wave
-          </a>
-        )}
 
         <Button
           variant="primary"

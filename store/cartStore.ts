@@ -11,6 +11,7 @@ export interface CartItem {
   size: string
   qty: number
   slug: string
+  wavePaymentUrl?: string
 }
 
 interface CartStore {
