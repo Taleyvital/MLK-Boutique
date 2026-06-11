@@ -1,26 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Colors */
+  --color-primary: #4c0002;
+  --color-primary-container: #720808;
+  --color-secondary: #7d525d;
+  --color-secondary-container: #fec6d3;
+  --color-tertiary: #072436;
+  --color-tertiary-container: #bad4ed;
+  --color-surface: #fef8f2;
+  --color-surface-low: #f9f3ed;
+  --color-surface-rose: #f6e6e5;
+  --color-surface-mist: #dae9f7;
+  --color-on-surface: #1d1b18;
+  --color-on-surface-variant: #58413e;
+  --color-outline: #8c716d;
+  --color-outline-variant: #dfbfbb;
+
+  /* Fonts */
+  --font-display: 'Playfair Display', serif;
+  --font-serif: 'Libre Caslon Text', serif;
+  --font-sans: 'DM Sans', sans-serif;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-brand: 0 4px 20px rgb(114 8 8 / 0.05);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fef8f2;
+  color: #1d1b18;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-serif {
+  font-family: 'Libre Caslon Text', serif;
+}
+
+.font-sans {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Cart bounce animation when item arrives */
+@keyframes cart-arrive {
+  0%   { transform: scale(1) rotate(0deg); }
+  20%  { transform: scale(1.35) rotate(-12deg); }
+  40%  { transform: scale(0.9) rotate(8deg); }
+  60%  { transform: scale(1.2) rotate(-6deg); }
+  80%  { transform: scale(0.95) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+#cart-icon.cart-arrived {
+  animation: cart-arrive 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Product image pulse on add-to-cart click */
+@keyframes image-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.add-to-cart-pulse {
+  animation: image-pulse 0.2s ease;
+}
+
+/* Hero slideshow */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes progress-bar {
+  from { width: 0%; }
+  to   { width: 100%; }
 }
