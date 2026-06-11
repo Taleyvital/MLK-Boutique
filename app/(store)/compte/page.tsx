@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import {
   User, Phone, MapPin, Package, ChevronRight,
   MessageCircle, Edit2, Check, X, ShoppingBag,
@@ -358,6 +359,25 @@ export default function ComptePage() {
           </p>
           <p className="font-sans text-xs text-outline mt-3">Abidjan, Côte d'Ivoire · {new Date().getFullYear()}</p>
         </section>
+
+        {/* ── Développé par Webey ── */}
+        <a
+          href="https://webey-agency-elevate.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center gap-2 py-4 opacity-70 hover:opacity-100 transition-opacity"
+        >
+          <span className="font-sans text-[10px] text-outline uppercase tracking-widest">
+            Développé par
+          </span>
+          <Image
+            src="/webey-cover-black.jpeg"
+            alt="Webey Agency"
+            width={100}
+            height={32}
+            className="object-contain rounded"
+          />
+        </a>
 
       </div>
     </div>

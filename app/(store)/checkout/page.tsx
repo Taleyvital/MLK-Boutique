@@ -165,7 +165,7 @@ export default function CheckoutPage() {
             {PAYMENT_LOGOS.map(({ name, src }) => (
               <div
                 key={name}
-                className="bg-white rounded-xl p-2 shadow-sm flex items-center justify-center"
+                className="bg-white rounded-xl p-2 shadow-sm flex items-center justify-center overflow-hidden"
                 style={{ width: 64, height: 40 }}
                 title={name}
               >

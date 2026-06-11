@@ -35,7 +35,7 @@ export function CheckoutButtons() {
           {PAYMENT_LOGOS.map(({ name, src }) => (
             <div
               key={name}
-              className="bg-white rounded-lg flex items-center justify-center"
+              className="bg-white rounded-lg flex items-center justify-center overflow-hidden"
               style={{ width: 44, height: 26 }}
             >
               <Image
