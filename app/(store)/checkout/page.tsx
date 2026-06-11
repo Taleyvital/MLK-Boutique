@@ -8,6 +8,15 @@ import { Button } from '@/components/ui/Button'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCart } from '@/hooks/useCart'
 import { supabase } from '@/lib/supabase/client'
+import type { CartItem } from '@/store/cartStore'
+
+const BOUTIQUE_WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+2250141330444').replace(/\D/g, '')
+
+function buildOwnerNotification(orderId: string, name: string, phone: string, address: string, items: CartItem[], total: number) {
+  const lines = items.map(i => `• ${i.name} (${i.size}) ×${i.qty} — ${formatPrice(i.price * i.qty)}`).join('\n')
+  const text = `🛍️ *Nouvelle commande* #${orderId.slice(0, 8).toUpperCase()}\n\n👤 ${name}\n📞 ${phone}\n📍 ${address}\n\n${lines}\n\n💰 *Total : ${formatPrice(total)}*`
+  return `https://wa.me/${BOUTIQUE_WHATSAPP}?text=${encodeURIComponent(text)}`
+}
 
 const PAYMENT_LOGOS = [
   { name: 'MTN Mobile Money', src: '/moyen-paiement/MTN-CI.jpg' },
@@ -65,6 +74,11 @@ export default function CheckoutPage() {
 
       const order = data as { id: string }
       clearCart()
+
+      // Notification WhatsApp automatique à la boutique
+      const waUrl = buildOwnerNotification(order.id, form.name, form.phone, form.address, items, cartTotal)
+      window.open(waUrl, '_blank')
+
       router.push(`/confirmation?orderId=${order.id}`)
     } catch (err) {
       setError('Une erreur est survenue. Veuillez réessayer.')
