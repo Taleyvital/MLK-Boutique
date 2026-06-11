@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Package, ShoppingCart, TrendingUp, PlusCircle } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
-import { WaveLinkSetting } from '@/components/admin/WaveLinkSetting'
 
 async function getStats() {
   try {
@@ -80,9 +79,6 @@ export default async function AdminDashboard() {
           <span className="font-sans font-semibold text-on-surface">Voir les commandes</span>
         </Link>
       </div>
-
-      {/* Wave payment link setting */}
-      <WaveLinkSetting />
 
       {recentOrders.length > 0 && (
         <div>

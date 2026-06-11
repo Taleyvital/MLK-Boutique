@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Upload, X, Loader2, Trash2, AlertTriangle } from 'lucide-react'
+import { Upload, X, Loader2, Trash2, AlertTriangle, Link as LinkIcon } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase/client'
@@ -36,14 +36,15 @@ export function ProductForm({ product }: ProductFormProps) {
   const [selectedSizes, setSelectedSizes]   = useState<string[]>(product?.sizes ?? [])
 
   const [form, setForm] = useState({
-    name:          product?.name          ?? '',
-    categorySlug:  '',   // resolved below after categories fetch
-    price:         product?.price?.toString()         ?? '',
-    comparePrice:  product?.compare_price?.toString() ?? '',
-    stock:         product?.stock?.toString()         ?? '0',
-    description:   product?.description  ?? '',
-    isActive:      product?.is_active     ?? true,
-    isNew:         product?.is_new        ?? false,
+    name:            product?.name              ?? '',
+    categorySlug:    '',
+    price:           product?.price?.toString()         ?? '',
+    comparePrice:    product?.compare_price?.toString() ?? '',
+    stock:           product?.stock?.toString()         ?? '0',
+    description:     product?.description      ?? '',
+    isActive:        product?.is_active         ?? true,
+    isNew:           product?.is_new            ?? false,
+    wavePaymentUrl:  product?.wave_payment_url  ?? '',
   })
 
   // We need the category slug from the category_id — fetched lazily the first time
@@ -122,16 +123,17 @@ export function ProductForm({ product }: ProductFormProps) {
       .replace(/^-|-$/g, '')
 
     const payload = {
-      name:          form.name,
-      description:   form.description || null,
-      price:         parseInt(form.price),
-      compare_price: form.comparePrice ? parseInt(form.comparePrice) : null,
-      category_id:   catId,
-      images:        imageUrls,
-      sizes:         selectedSizes,
-      stock:         parseInt(form.stock) || 0,
-      is_active:     form.isActive,
-      is_new:        form.isNew,
+      name:              form.name,
+      description:       form.description || null,
+      price:             parseInt(form.price),
+      compare_price:     form.comparePrice ? parseInt(form.comparePrice) : null,
+      category_id:       catId,
+      images:            imageUrls,
+      sizes:             selectedSizes,
+      stock:             parseInt(form.stock) || 0,
+      is_active:         form.isActive,
+      is_new:            form.isNew,
+      wave_payment_url:  form.wavePaymentUrl.trim() || null,
     }
 
     if (isEdit) {
@@ -296,6 +298,28 @@ export function ProductForm({ product }: ProductFormProps) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Lien Wave */}
+      <div>
+        <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5 flex items-center gap-2">
+          <Image src="/moyen-paiement/wave.png" alt="Wave" width={18} height={18} className="rounded object-contain" />
+          Lien de paiement Wave
+        </label>
+        <div className="relative">
+          <LinkIcon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" strokeWidth={1.5} />
+          <input
+            name="wavePaymentUrl"
+            type="url"
+            value={form.wavePaymentUrl}
+            onChange={handleChange}
+            placeholder="https://pay.wave.com/m/..."
+            className="w-full pl-9 pr-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none transition-colors"
+          />
+        </div>
+        <p className="font-sans text-xs text-outline mt-1">
+          Lien Wave spécifique à ce produit (montant pré-rempli).
+        </p>
       </div>
 
       {/* Toggles */}

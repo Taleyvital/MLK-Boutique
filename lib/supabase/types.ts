@@ -20,6 +20,7 @@ export interface Product {
   stock: number
   is_active: boolean
   is_new: boolean
+  wave_payment_url: string | null
   created_at: string
   categories?: Category
 }
