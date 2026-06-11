@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, User, MapPin } from 'lucide-react'
+import { ArrowLeft, Phone, User, MapPin, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { formatPrice } from '@/lib/formatPrice'
@@ -17,6 +17,11 @@ function buildOwnerNotification(orderId: string, name: string, phone: string, ad
   const text = `🛍️ *Nouvelle commande* #${orderId.slice(0, 8).toUpperCase()}\n\n👤 ${name}\n📞 ${phone}\n📍 ${address}\n\n${lines}\n\n💰 *Total : ${formatPrice(total)}*`
   return `https://wa.me/${BOUTIQUE_WHATSAPP}?text=${encodeURIComponent(text)}`
 }
+
+const MTN_ORANGE_LOGOS = [
+  { name: 'MTN Mobile Money', src: '/moyen-paiement/MTN-CI.jpg' },
+  { name: 'Orange Money',     src: '/moyen-paiement/Orange-money.png' },
+]
 
 const PAYMENT_LOGOS = [
   { name: 'MTN Mobile Money', src: '/moyen-paiement/MTN-CI.jpg' },
@@ -35,6 +40,7 @@ export default function CheckoutPage() {
     address: '',
   })
   const [loading, setLoading] = useState(false)
+  const [waveLoading, setWaveLoading] = useState(false)
   const [error, setError] = useState('')
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -83,6 +89,35 @@ export default function CheckoutPage() {
     } catch (err) {
       setError('Une erreur est survenue. Veuillez réessayer.')
       setLoading(false)
+    }
+  }
+
+  async function handleWave() {
+    if (!form.name || !form.phone || !form.address) {
+      setError('Veuillez remplir tous les champs.')
+      return
+    }
+    setWaveLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/wave/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: form.name,
+          customerPhone: form.phone,
+          customerAddress: form.address,
+          items,
+          total: cartTotal,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erreur Wave')
+      clearCart()
+      window.location.href = data.wave_launch_url
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur Wave, réessayez.')
+      setWaveLoading(false)
     }
   }
 
@@ -170,44 +205,53 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Payment methods */}
-        <div className="bg-tertiary-container/30 rounded-xl p-4">
-          <p className="font-sans text-xs text-on-surface-variant uppercase tracking-widest mb-3">
-            Modes de paiement acceptés
-          </p>
-          <div className="flex gap-3 items-center">
-            {PAYMENT_LOGOS.map(({ name, src }) => (
-              <div
-                key={name}
-                className="bg-white rounded-xl p-2 shadow-sm flex items-center justify-center overflow-hidden"
-                style={{ width: 64, height: 40 }}
-                title={name}
-              >
-                <Image
-                  src={src}
-                  alt={name}
-                  width={52}
-                  height={28}
-                  className="object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
         {error && (
           <p className="font-sans text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2">{error}</p>
         )}
 
-        <Button
-          variant="primary"
-          size="lg"
-          fullWidth
-          onClick={handleSubmit}
-          disabled={loading}
+        {/* ── Wave (recommandé) ── */}
+        <button
+          onClick={handleWave}
+          disabled={waveLoading || loading}
+          className="w-full rounded-2xl overflow-hidden border-2 border-[#1DC3C3]/40 bg-[#E8FAF9] flex flex-col items-center gap-2 py-4 px-4 active:scale-[0.98] transition-transform disabled:opacity-60"
         >
-          {loading ? 'Traitement en cours...' : `Confirmer — ${formatPrice(cartTotal)}`}
-        </Button>
+          <div className="flex items-center gap-2">
+            <Image src="/moyen-paiement/wave.png" alt="Wave" width={32} height={32} className="object-contain rounded-lg overflow-hidden" />
+            <span className="font-sans font-bold text-[#0D9488] text-base">
+              {waveLoading ? 'Redirection...' : 'Payer avec Wave'}
+            </span>
+            {waveLoading && <Loader2 size={16} className="animate-spin text-[#0D9488]" />}
+          </div>
+          <span className="font-sans text-xs text-[#0D9488]/70">Paiement sécurisé · Confirmation instantanée</span>
+        </button>
+
+        {/* ── MTN / Orange Money ── */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-outline-variant/30" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-surface px-3 font-sans text-xs text-outline">ou</span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading || waveLoading}
+          className="w-full rounded-2xl bg-primary text-white flex flex-col items-center gap-2 py-4 px-4 active:scale-[0.98] transition-transform disabled:opacity-60"
+        >
+          <div className="flex items-center gap-2">
+            {MTN_ORANGE_LOGOS.map(({ name, src }) => (
+              <div key={name} className="bg-white rounded-lg flex items-center justify-center overflow-hidden" style={{ width: 40, height: 24 }}>
+                <Image src={src} alt={name} width={34} height={20} className="object-contain" />
+              </div>
+            ))}
+            <span className="font-sans font-semibold text-sm ml-1">
+              {loading ? 'Traitement...' : `MTN / Orange — ${formatPrice(cartTotal)}`}
+            </span>
+            {loading && <Loader2 size={16} className="animate-spin" />}
+          </div>
+        </button>
       </div>
     </div>
   )
