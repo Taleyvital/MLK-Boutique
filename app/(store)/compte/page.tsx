@@ -5,7 +5,7 @@ import Image from 'next/image'
 import {
   User, Phone, MapPin, Package, ChevronRight,
   MessageCircle, Edit2, Check, X, ShoppingBag,
-  Clock, Truck, Ban, Star
+  Clock, Truck, Ban, Star, LayoutDashboard
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/formatPrice'
@@ -305,6 +305,21 @@ export default function ComptePage() {
             </div>
           )}
         </section>
+
+        {/* ── Gestion stock (admin) ── */}
+        <Link
+          href="/admin"
+          className="flex items-center gap-4 bg-primary rounded-2xl px-5 py-4 hover:bg-primary-container transition-colors"
+        >
+          <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+            <LayoutDashboard size={18} className="text-white" strokeWidth={1.5} />
+          </div>
+          <div className="flex-1">
+            <p className="font-sans font-semibold text-sm text-white">Gestion stock</p>
+            <p className="font-sans text-xs text-white/70">Produits · Commandes · Dashboard</p>
+          </div>
+          <ChevronRight size={16} className="text-white/60" strokeWidth={1.5} />
+        </Link>
 
         {/* ── Contact & liens utiles ── */}
         <section className="bg-white rounded-2xl shadow-brand overflow-hidden">

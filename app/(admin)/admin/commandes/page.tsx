@@ -1,15 +1,9 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Phone, MapPin, CreditCard, MessageCircle } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 import { formatPrice } from '@/lib/formatPrice'
-import type { Order } from '@/lib/supabase/types'
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  nouvelle: { label: 'Nouvelle', color: 'bg-secondary-container text-primary' },
-  confirmée: { label: 'Confirmée', color: 'bg-blue-50 text-blue-700' },
-  livrée: { label: 'Livrée', color: 'bg-green-50 text-green-700' },
-  annulée: { label: 'Annulée', color: 'bg-red-50 text-red-700' },
-}
+import { OrderStatusSelect } from '@/components/admin/OrderStatusSelect'
+import type { Order, OrderItem } from '@/lib/supabase/types'
 
 async function getOrders(): Promise<Order[]> {
   try {
@@ -27,6 +21,10 @@ async function getOrders(): Promise<Order[]> {
 export default async function CommandesPage() {
   const orders = await getOrders()
 
+  const revenue = orders
+    .filter(o => o.status !== 'annulée')
+    .reduce((sum, o) => sum + o.total, 0)
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-8">
       <div className="flex items-center gap-3 mb-6">
@@ -42,48 +40,86 @@ export default async function CommandesPage() {
         </span>
       </div>
 
-      <div className="space-y-3">
+      {/* Stats rapides */}
+      {orders.length > 0 && (
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {[
+            { label: 'Total',      value: orders.length.toString(),                                        sub: 'commandes' },
+            { label: 'En attente', value: orders.filter(o => o.status === 'nouvelle').length.toString(),    sub: 'à traiter' },
+            { label: 'CA',         value: formatPrice(revenue),                                             sub: 'hors annulées' },
+          ].map(({ label, value, sub }) => (
+            <div key={label} className="bg-surface rounded-xl p-3 shadow-brand text-center">
+              <p className="font-sans text-[10px] text-on-surface-variant uppercase tracking-wider mb-0.5">{label}</p>
+              <p className="font-sans font-bold text-sm text-primary truncate">{value}</p>
+              <p className="font-sans text-[10px] text-outline">{sub}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="space-y-4">
         {orders.map((order) => {
-          const status = STATUS_LABELS[order.status] || STATUS_LABELS.nouvelle
-          const itemCount = Array.isArray(order.items) ? order.items.length : 0
+          const items = order.items as OrderItem[]
           return (
-            <div key={order.id} className="bg-surface rounded-xl p-4 shadow-brand">
-              <div className="flex items-start justify-between mb-2">
+            <div key={order.id} className="bg-surface rounded-2xl shadow-brand overflow-hidden">
+              {/* Header commande */}
+              <div className="flex items-start justify-between px-4 pt-4 pb-3">
                 <div>
-                  <p className="font-sans font-semibold text-sm text-on-surface">
-                    {order.customer_name}
-                  </p>
-                  <p className="font-sans text-xs text-on-surface-variant">
+                  <p className="font-sans font-semibold text-sm text-on-surface">{order.customer_name}</p>
+                  <p className="font-sans text-xs text-on-surface-variant mt-0.5">
                     #{order.id.slice(0, 8).toUpperCase()} ·{' '}
                     {new Date(order.created_at).toLocaleDateString('fr-FR', {
-                      day: 'numeric',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit',
+                      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
                     })}
                   </p>
                 </div>
-                <span className={`rounded-full px-2.5 py-0.5 font-sans text-xs font-medium ${status.color}`}>
-                  {status.label}
-                </span>
+                {/* Statut modifiable en live */}
+                <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
               </div>
-              <div className="w-full h-px bg-surface-mist mb-2" />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="font-sans text-xs text-on-surface-variant">
-                    {itemCount} article{itemCount !== 1 ? 's' : ''}
-                  </span>
-                  <span className="font-sans text-xs text-on-surface-variant">
-                    {order.payment_method === 'mobile_money' ? '📱 Mobile Money' : '💬 WhatsApp'}
-                  </span>
+
+              {/* Séparateur */}
+              <div className="h-px bg-outline-variant/20 mx-4" />
+
+              {/* Articles */}
+              <div className="px-4 py-3 space-y-1.5">
+                {items.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between gap-2">
+                    <span className="font-sans text-xs text-on-surface-variant flex-1 truncate">
+                      {item.name} <span className="text-outline">({item.size}) ×{item.qty}</span>
+                    </span>
+                    <span className="font-sans text-xs font-medium text-on-surface flex-shrink-0">
+                      {formatPrice(item.price * item.qty)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="h-px bg-outline-variant/20 mx-4" />
+              <div className="px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 text-on-surface-variant">
+                    <Phone size={12} strokeWidth={1.5} />
+                    <span className="font-sans text-xs">{order.customer_phone}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-on-surface-variant">
+                    <MapPin size={12} strokeWidth={1.5} />
+                    <span className="font-sans text-xs">{order.customer_address}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-on-surface-variant">
+                    {order.payment_method === 'mobile_money'
+                      ? <CreditCard size={12} strokeWidth={1.5} />
+                      : <MessageCircle size={12} strokeWidth={1.5} />}
+                    <span className="font-sans text-xs">
+                      {order.payment_method === 'mobile_money' ? 'Mobile Money' : 'WhatsApp'}
+                    </span>
+                  </div>
                 </div>
-                <span className="font-sans font-semibold text-sm text-[#720808]">
-                  {formatPrice(order.total)}
-                </span>
+                <div className="text-right">
+                  <p className="font-sans text-xs text-on-surface-variant">Total</p>
+                  <p className="font-sans font-bold text-base text-primary">{formatPrice(order.total)}</p>
+                </div>
               </div>
-              <p className="font-sans text-xs text-on-surface-variant mt-1.5">
-                📍 {order.customer_address}
-              </p>
             </div>
           )
         })}
