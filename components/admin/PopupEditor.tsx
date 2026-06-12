@@ -7,6 +7,17 @@ import { savePromoPopup } from '@/app/(admin)/admin/popup/actions'
 import { supabase } from '@/lib/supabase/client'
 import type { PromoConfig } from '@/app/(admin)/admin/popup/actions'
 
+const PAGE_OPTIONS = [
+  { label: '— Choisir une page —', value: '' },
+  { label: '🏠 Accueil', value: '/' },
+  { label: '🛍️ Boutique — tout', value: '/boutique' },
+  { label: '👗 Vêtements', value: '/boutique?cat=vetements' },
+  { label: '💎 Bijoux & Montres', value: '/boutique?cat=bijoux-montres' },
+  { label: '✨ Beauté', value: '/boutique?cat=beaute' },
+  { label: '👠 Chaussures', value: '/boutique?cat=chaussures' },
+  { label: '🛒 Panier', value: '/panier' },
+]
+
 const EMPTY: PromoConfig = {
   active: false,
   title: '',
@@ -123,7 +134,7 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
       </div>
 
       {/* Bouton */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         <div>
           <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Texte du bouton</label>
           <input name="buttonText" value={form.buttonText} onChange={handleChange}
@@ -132,8 +143,22 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
         </div>
         <div>
           <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Lien du bouton</label>
+          {/* Sélecteur rapide */}
+          <select
+            value={PAGE_OPTIONS.some(o => o.value === form.buttonLink) ? form.buttonLink : '__custom__'}
+            onChange={e => {
+              if (e.target.value !== '__custom__') setForm(f => ({ ...f, buttonLink: e.target.value }))
+            }}
+            className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface border border-transparent focus:border-primary focus:outline-none appearance-none mb-2"
+          >
+            {PAGE_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+            <option value="__custom__">✏️ Lien personnalisé...</option>
+          </select>
+          {/* Champ manuel */}
           <input name="buttonLink" value={form.buttonLink} onChange={handleChange}
-            placeholder="ex : /boutique"
+            placeholder="ou saisir un lien manuellement"
             className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none" />
         </div>
       </div>

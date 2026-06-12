@@ -23,7 +23,12 @@ async function getAllProducts(): Promise<{ products: Product[]; categoryMap: Rec
   }
 }
 
-export default async function CataloguePage() {
+export default async function CataloguePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cat?: string }>
+}) {
+  const { cat } = await searchParams
   const { products, categoryMap } = await getAllProducts()
-  return <CatalogueClient products={products} categoryMap={categoryMap} />
+  return <CatalogueClient products={products} categoryMap={categoryMap} initialCategory={cat} />
 }

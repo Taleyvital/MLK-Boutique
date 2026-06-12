@@ -19,11 +19,13 @@ const FILTERS = [
 export function CatalogueClient({
   products,
   categoryMap,
+  initialCategory,
 }: {
   products: Product[]
   categoryMap: Record<string, string>
+  initialCategory?: string
 }) {
-  const [activeFilter, setActiveFilter] = useState('tout')
+  const [activeFilter, setActiveFilter] = useState(initialCategory ?? 'tout')
 
   const filtered = products
     .filter((p) => {
