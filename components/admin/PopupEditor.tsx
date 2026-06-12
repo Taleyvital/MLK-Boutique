@@ -58,12 +58,12 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
     if (form.active && !form.title) { setError('Le titre est obligatoire quand le popup est actif.'); return }
     setError('')
     startTransition(async () => {
-      try {
-        await savePromoPopup(form)
+      const result = await savePromoPopup(form)
+      if (result.success) {
         setSuccess(true)
         setTimeout(() => setSuccess(false), 2500)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Erreur')
+      } else {
+        setError(result.error ?? 'Erreur lors de la sauvegarde')
       }
     })
   }

@@ -45,12 +45,12 @@ export function HeroEditor({ initialSlides }: { initialSlides: HeroSlide[] }) {
     if (invalid) { setError('Chaque slide doit avoir une image et un titre.'); return }
     setError('')
     startTransition(async () => {
-      try {
-        await saveHeroSlides(slides)
+      const result = await saveHeroSlides(slides)
+      if (result.success) {
         setSuccess(true)
         setTimeout(() => setSuccess(false), 2500)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Erreur')
+      } else {
+        setError(result.error ?? 'Erreur lors de la sauvegarde')
       }
     })
   }

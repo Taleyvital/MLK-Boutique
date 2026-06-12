@@ -12,28 +12,32 @@ export interface PromoConfig {
   imageUrl: string
 }
 
+const STORAGE_PATH = 'settings/promo_popup.json'
+const BUCKET = 'products'
+
 export async function getPromoPopup(): Promise<PromoConfig | null> {
   try {
     const supabase = createServerClient()
-    const { data } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'promo_popup')
-      .maybeSingle()
-    if (!data) return null
-    return JSON.parse((data as { value: string }).value) as PromoConfig
+    const { data, error } = await supabase.storage.from(BUCKET).download(STORAGE_PATH)
+    if (error || !data) return null
+    const text = await data.text()
+    return JSON.parse(text) as PromoConfig
   } catch {
     return null
   }
 }
 
-export async function savePromoPopup(config: PromoConfig) {
-  const supabase = createServerClient()
-  const { error } = await supabase
-    .from('settings')
-    .upsert({ key: 'promo_popup', value: JSON.stringify(config) } as never)
-
-  if (error) throw new Error(error.message)
-
-  revalidatePath('/', 'layout')
+export async function savePromoPopup(config: PromoConfig): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = createServerClient()
+    const blob = new Blob([JSON.stringify(config)], { type: 'application/json' })
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(STORAGE_PATH, blob, { upsert: true, contentType: 'application/json' })
+    if (error) return { success: false, error: error.message }
+    revalidatePath('/', 'layout')
+    return { success: true }
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Erreur inconnue' }
+  }
 }

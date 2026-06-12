@@ -10,6 +10,9 @@ export interface HeroSlide {
   label: string
 }
 
+const STORAGE_PATH = 'settings/hero_slides.json'
+const BUCKET = 'products'
+
 const DEFAULT_SLIDES: HeroSlide[] = [
   { src: '/_ (1).jpeg', title: 'Nouvelle Saison', subtitle: "L'élégance ivoirienne revisitée pour la femme moderne.", label: 'Collection 2025' },
   { src: '/vert-avocat.jpeg', title: 'Style & Élégance', subtitle: 'Des créations uniques pour sublimer chaque silhouette.', label: 'Nouveautés' },
@@ -19,25 +22,26 @@ const DEFAULT_SLIDES: HeroSlide[] = [
 export async function getHeroSlides(): Promise<HeroSlide[]> {
   try {
     const supabase = createServerClient()
-    const { data } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'hero_slides')
-      .maybeSingle()
-    if (!data) return DEFAULT_SLIDES
-    return JSON.parse((data as { value: string }).value) as HeroSlide[]
+    const { data, error } = await supabase.storage.from(BUCKET).download(STORAGE_PATH)
+    if (error || !data) return DEFAULT_SLIDES
+    const text = await data.text()
+    return JSON.parse(text) as HeroSlide[]
   } catch {
     return DEFAULT_SLIDES
   }
 }
 
-export async function saveHeroSlides(slides: HeroSlide[]) {
-  const supabase = createServerClient()
-  const { error } = await supabase
-    .from('settings')
-    .upsert({ key: 'hero_slides', value: JSON.stringify(slides) } as never)
-
-  if (error) throw new Error(error.message)
-
-  revalidatePath('/')
+export async function saveHeroSlides(slides: HeroSlide[]): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = createServerClient()
+    const blob = new Blob([JSON.stringify(slides)], { type: 'application/json' })
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(STORAGE_PATH, blob, { upsert: true, contentType: 'application/json' })
+    if (error) return { success: false, error: error.message }
+    revalidatePath('/')
+    return { success: true }
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Erreur inconnue' }
+  }
 }
