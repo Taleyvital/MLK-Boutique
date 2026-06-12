@@ -25,7 +25,10 @@ export default function CheckoutPage() {
   const cartTotal = total()
 
   // Lien Wave du premier article qui en possède un
-  const waveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? ''
+  const rawWaveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? ''
+  const waveUrl = rawWaveUrl && !rawWaveUrl.startsWith('http')
+    ? `https://${rawWaveUrl}`
+    : rawWaveUrl
 
   const [form, setForm] = useState({
     name: '',

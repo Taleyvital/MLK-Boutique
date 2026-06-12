@@ -29,6 +29,7 @@ export function ProductGrid({ products, asymmetric = false }: ProductGridProps) 
           isNew={product.is_new}
           slug={product.slug}
           sizes={product.sizes}
+          wavePaymentUrl={product.wave_payment_url ?? undefined}
           className={asymmetric && index % 2 === 0 ? 'mt-4' : ''}
         />
       ))}

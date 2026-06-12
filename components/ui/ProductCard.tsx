@@ -19,6 +19,7 @@ interface ProductCardProps {
   isNew?: boolean
   slug: string
   sizes?: string[]
+  wavePaymentUrl?: string
   className?: string
 }
 
@@ -31,6 +32,7 @@ export function ProductCard({
   isNew,
   slug,
   sizes = [],
+  wavePaymentUrl,
   className,
 }: ProductCardProps) {
   const router = useRouter()
@@ -61,6 +63,7 @@ export function ProductCard({
       size: sizes[0] || 'Unique',
       qty: 1,
       slug,
+      wavePaymentUrl,
     })
   }
 

@@ -17,7 +17,10 @@ export function CheckoutButtons() {
   const { items, total } = useCart()
 
   // Lien Wave du premier article qui en possède un
-  const waveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? null
+  const rawWaveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? null
+  const waveUrl = rawWaveUrl && !rawWaveUrl.startsWith('http')
+    ? `https://${rawWaveUrl}`
+    : rawWaveUrl
 
   function handleWhatsApp() {
     const url = getWhatsAppUrl(items, total(), { name: '', address: 'Abidjan' })
