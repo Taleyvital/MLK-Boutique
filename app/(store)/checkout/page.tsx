@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, User, MapPin } from 'lucide-react'
 import Image from 'next/image'
@@ -10,6 +10,7 @@ import { useCart } from '@/hooks/useCart'
 import { supabase } from '@/lib/supabase/client'
 import type { CartItem } from '@/store/cartStore'
 
+
 const BOUTIQUE_WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+2250141330444').replace(/\D/g, '')
 
 function buildOwnerNotification(orderId: string, name: string, phone: string, address: string, items: CartItem[], total: number) {
@@ -18,16 +19,13 @@ function buildOwnerNotification(orderId: string, name: string, phone: string, ad
   return `https://wa.me/${BOUTIQUE_WHATSAPP}?text=${encodeURIComponent(text)}`
 }
 
-const PAYMENT_LOGOS = [
-  { name: 'MTN Mobile Money', src: '/moyen-paiement/MTN-CI.jpg' },
-  { name: 'Orange Money',     src: '/moyen-paiement/Orange-money.png' },
-  { name: 'Wave',             src: '/moyen-paiement/wave.png' },
-]
-
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, total, clearCart } = useCart()
   const cartTotal = total()
+
+  // Lien Wave du premier article qui en possède un
+  const waveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? ''
 
   const [form, setForm] = useState({
     name: '',
@@ -36,19 +34,6 @@ export default function CheckoutPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [waveUrl, setWaveUrl] = useState('')
-
-  useEffect(() => {
-    supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'wave_payment_url')
-      .single()
-      .then(({ data }) => {
-        const val = (data as { value: string } | null)?.value ?? ''
-        setWaveUrl(val)
-      })
-  }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -186,43 +171,42 @@ export default function CheckoutPage() {
         {/* Payment methods */}
         <div className="bg-tertiary-container/30 rounded-xl p-4">
           <p className="font-sans text-xs text-on-surface-variant uppercase tracking-widest mb-3">
-            Modes de paiement acceptés
+            Mode de paiement pour le moment
           </p>
-          <div className="flex gap-3 items-center">
-            {PAYMENT_LOGOS.map(({ name, src }) => (
-              <div
-                key={name}
-                className="bg-white rounded-xl p-2 shadow-sm flex items-center justify-center overflow-hidden"
-                style={{ width: 64, height: 40 }}
-                title={name}
-              >
-                <Image
-                  src={src}
-                  alt={name}
-                  width={52}
-                  height={28}
-                  className="object-contain"
-                />
-              </div>
-            ))}
-          </div>
+          {waveUrl ? (
+            <a
+              href={waveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 w-full rounded-xl bg-[#1DC3C3] text-white px-4 py-3 font-sans font-bold text-base active:scale-[0.98] transition-transform"
+            >
+              <Image
+                src="/moyen-paiement/wave.png"
+                alt="Wave"
+                width={32}
+                height={32}
+                className="rounded-lg object-contain bg-white p-0.5"
+              />
+              Payer avec Wave
+            </a>
+          ) : (
+            <div
+              className="bg-white rounded-xl p-2 shadow-sm flex items-center justify-center overflow-hidden"
+              style={{ width: 64, height: 40 }}
+            >
+              <Image
+                src="/moyen-paiement/wave.png"
+                alt="Wave"
+                width={52}
+                height={28}
+                className="object-contain"
+              />
+            </div>
+          )}
         </div>
 
         {error && (
           <p className="font-sans text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2">{error}</p>
-        )}
-
-        {/* Bouton Wave — visible seulement si le lien est configuré */}
-        {waveUrl && (
-          <a
-            href={waveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full rounded-2xl bg-[#1DC3C3] text-white py-4 font-sans font-bold text-base active:scale-[0.98] transition-transform"
-          >
-            <Image src="/moyen-paiement/wave.png" alt="Wave" width={28} height={28} className="rounded-lg overflow-hidden object-contain bg-white p-0.5" />
-            Payer avec Wave
-          </a>
         )}
 
         <Button
