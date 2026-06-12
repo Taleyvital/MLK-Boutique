@@ -23,7 +23,7 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
       .from('settings')
       .select('value')
       .eq('key', 'hero_slides')
-      .single()
+      .maybeSingle()
     if (!data) return DEFAULT_SLIDES
     return JSON.parse((data as { value: string }).value) as HeroSlide[]
   } catch {

@@ -19,7 +19,7 @@ export async function getPromoPopup(): Promise<PromoConfig | null> {
       .from('settings')
       .select('value')
       .eq('key', 'promo_popup')
-      .single()
+      .maybeSingle()
     if (!data) return null
     return JSON.parse((data as { value: string }).value) as PromoConfig
   } catch {
