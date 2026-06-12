@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Loader2, Check } from 'lucide-react'
+import { Loader2, Check, Upload, X } from 'lucide-react'
+import Image from 'next/image'
 import { savePromoPopup } from '@/app/(admin)/admin/popup/actions'
+import { supabase } from '@/lib/supabase/client'
 import type { PromoConfig } from '@/app/(admin)/admin/popup/actions'
 
 const EMPTY: PromoConfig = {
@@ -19,11 +21,26 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
   const [isPending, startTransition] = useTransition()
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const target = e.target as HTMLInputElement
     const value = target.type === 'checkbox' ? target.checked : target.value
     setForm(f => ({ ...f, [target.name]: value }))
+  }
+
+  async function handleFlyer(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError('')
+    const ext = file.name.split('.').pop()
+    const fileName = `popup-${Date.now()}.${ext}`
+    const { error: uploadError } = await supabase.storage.from('products').upload(fileName, file)
+    if (uploadError) { setError('Erreur upload : ' + uploadError.message); setUploading(false); return }
+    const { data } = supabase.storage.from('products').getPublicUrl(fileName)
+    setForm(f => ({ ...f, imageUrl: data.publicUrl }))
+    setUploading(false)
   }
 
   function handleSave() {
@@ -73,12 +90,36 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
           className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none resize-none" />
       </div>
 
-      {/* Image URL */}
+      {/* Flyer / Image */}
       <div>
-        <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Image (URL, optionnel)</label>
-        <input name="imageUrl" type="url" value={form.imageUrl} onChange={handleChange}
-          placeholder="https://..."
-          className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none" />
+        <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Flyer / Image (optionnel)</label>
+        <div className="space-y-2">
+          {/* Aperçu du flyer */}
+          {form.imageUrl && (
+            <div className="relative rounded-xl overflow-hidden bg-surface-rose">
+              <Image src={form.imageUrl} alt="Flyer" width={600} height={400} className="w-full object-contain max-h-48" />
+              <button
+                onClick={() => setForm(f => ({ ...f, imageUrl: '' }))}
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500 flex items-center justify-center text-white shadow"
+              >
+                <X size={13} />
+              </button>
+            </div>
+          )}
+          {/* Upload fichier */}
+          <label className="flex items-center gap-3 cursor-pointer border-2 border-dashed border-secondary-container rounded-xl px-4 py-3 hover:border-primary/40 transition-colors bg-surface-rose/30">
+            <input type="file" accept="image/*" className="hidden" onChange={handleFlyer} disabled={uploading} />
+            {uploading ? (
+              <><Loader2 size={16} className="animate-spin text-primary" /><span className="font-sans text-sm text-on-surface-variant">Upload en cours...</span></>
+            ) : (
+              <><Upload size={16} className="text-outline" /><span className="font-sans text-sm text-on-surface-variant">Uploader un flyer (JPG, PNG, WebP)</span></>
+            )}
+          </label>
+          {/* OU URL */}
+          <input name="imageUrl" type="url" value={form.imageUrl} onChange={handleChange}
+            placeholder="ou coller une URL d'image..."
+            className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none" />
+        </div>
       </div>
 
       {/* Bouton */}
