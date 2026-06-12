@@ -15,6 +15,8 @@ export async function deleteProduct(productId: string) {
 
   revalidatePath('/boutique')
   revalidatePath('/')
+  revalidatePath('/admin/produits')
+  revalidatePath('/admin')
   redirect('/admin/produits')
 }
 
@@ -74,6 +76,8 @@ export async function createProduct(payload: ProductPayload) {
 
   revalidatePath('/boutique')
   revalidatePath('/')
+  revalidatePath('/admin/produits')
+  revalidatePath('/admin')
   redirect('/admin/produits')
 }
 
@@ -102,5 +106,6 @@ export async function updateProduct(productId: string, payload: ProductPayload) 
 
   revalidatePath('/boutique')
   revalidatePath('/')
-  revalidatePath(`/boutique`, 'layout')
+  revalidatePath('/admin/produits')
+  revalidatePath('/admin')
 }
