@@ -40,6 +40,11 @@
   box-sizing: border-box;
 }
 
+/* Empêche le zoom iOS Safari sur focus des champs de saisie */
+input, textarea, select {
+  font-size: 16px;
+}
+
 html {
   scroll-behavior: smooth;
 }
