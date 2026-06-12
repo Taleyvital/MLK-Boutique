@@ -17,10 +17,18 @@ export function CheckoutButtons() {
   const { items, total } = useCart()
 
   // Lien Wave du premier article qui en possède un
-  const rawWaveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? null
-  const waveUrl = rawWaveUrl && !rawWaveUrl.startsWith('http')
+  const rawWaveUrl = items.find(i => i.wavePaymentUrl)?.wavePaymentUrl ?? ''
+  const normalizedWaveUrl = rawWaveUrl && !rawWaveUrl.startsWith('http')
     ? `https://${rawWaveUrl}`
     : rawWaveUrl
+  const waveUrl = (() => {
+    try {
+      const u = new URL(normalizedWaveUrl)
+      return u.hostname ? normalizedWaveUrl : ''
+    } catch {
+      return ''
+    }
+  })()
 
   function handleWhatsApp() {
     const url = getWhatsAppUrl(items, total(), { name: '', address: 'Abidjan' })

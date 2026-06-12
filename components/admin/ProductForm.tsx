@@ -105,6 +105,19 @@ export function ProductForm({ product }: ProductFormProps) {
       setError('Nom, catégorie et prix sont obligatoires.')
       return
     }
+    if (form.wavePaymentUrl.trim()) {
+      try {
+        const u = new URL(
+          form.wavePaymentUrl.trim().startsWith('http')
+            ? form.wavePaymentUrl.trim()
+            : `https://${form.wavePaymentUrl.trim()}`
+        )
+        if (!u.hostname) throw new Error()
+      } catch {
+        setError('Le lien Wave est invalide. Copiez-le directement depuis l\'application Wave.')
+        return
+      }
+    }
     setSaving(true)
     setError('')
     setSuccess('')
