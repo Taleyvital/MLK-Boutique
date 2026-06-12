@@ -6,7 +6,7 @@ import { Upload, X, Loader2, Trash2, AlertTriangle, Link as LinkIcon } from 'luc
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase/client'
-import { deleteProduct } from '@/app/(admin)/admin/produits/actions'
+import { deleteProduct, createProduct, updateProduct } from '@/app/(admin)/admin/produits/actions'
 import type { Product } from '@/lib/supabase/types'
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Unique']
@@ -109,50 +109,33 @@ export function ProductForm({ product }: ProductFormProps) {
     setError('')
     setSuccess('')
 
-    const { data: category } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('slug', form.categorySlug)
-      .single()
-    const catId = (category as { id: string } | null)?.id ?? null
-
-    const slug = form.name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-
     const payload = {
-      name:              form.name,
-      description:       form.description || null,
-      price:             parseInt(form.price),
-      compare_price:     form.comparePrice ? parseInt(form.comparePrice) : null,
-      category_id:       catId,
-      images:            imageUrls,
-      sizes:             selectedSizes,
-      stock:             parseInt(form.stock) || 0,
-      is_active:         form.isActive,
-      is_new:            form.isNew,
-      wave_payment_url:  form.wavePaymentUrl.trim() || null,
+      name:             form.name,
+      description:      form.description || null,
+      price:            parseInt(form.price),
+      compare_price:    form.comparePrice ? parseInt(form.comparePrice) : null,
+      categorySlug:     form.categorySlug,
+      images:           imageUrls,
+      sizes:            selectedSizes,
+      stock:            parseInt(form.stock) || 0,
+      is_active:        form.isActive,
+      is_new:           form.isNew,
+      wave_payment_url: form.wavePaymentUrl.trim() || null,
     }
 
-    if (isEdit) {
-      const { error: updateError } = await supabase
-        .from('products')
-        .update(payload as never)
-        .eq('id', product.id)
-      if (updateError) { setError('Erreur : ' + updateError.message); setSaving(false); return }
-      setSuccess('Produit mis à jour ✓')
+    try {
+      if (isEdit) {
+        await updateProduct(product!.id, payload)
+        setSuccess('Produit mis à jour ✓')
+        setSaving(false)
+        router.refresh()
+      } else {
+        await createProduct(payload)
+        // createProduct redirige automatiquement
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur inconnue')
       setSaving(false)
-      router.refresh()
-    } else {
-      const { error: insertError } = await supabase
-        .from('products')
-        .insert({ ...payload, slug: `${slug}-${Date.now()}` } as never)
-      if (insertError) { setError('Erreur : ' + insertError.message); setSaving(false); return }
-      router.push('/admin/produits')
-      router.refresh()
     }
   }
 
