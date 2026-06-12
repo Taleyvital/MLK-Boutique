@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Badge } from './Badge'
 import { formatPrice } from '@/lib/formatPrice'
@@ -32,6 +33,7 @@ export function ProductCard({
   sizes = [],
   className,
 }: ProductCardProps) {
+  const router = useRouter()
   const imageRef = useRef<HTMLDivElement>(null)
   const { triggerFly } = useCartAnim()
   const { addItem } = useCart()
@@ -42,7 +44,7 @@ export function ProductCard({
 
     // Si le produit a des tailles, on navigue vers la fiche
     if (sizes.length > 1) {
-      window.location.href = `/boutique/${slug}`
+      router.push(`/boutique/${slug}`)
       return
     }
 

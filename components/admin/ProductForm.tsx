@@ -6,6 +6,7 @@ import { Upload, X, Loader2, Trash2, AlertTriangle, Link as LinkIcon } from 'luc
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase/client'
+import { deleteProduct } from '@/app/(admin)/admin/produits/actions'
 import type { Product } from '@/lib/supabase/types'
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Unique']
@@ -157,13 +158,12 @@ export function ProductForm({ product }: ProductFormProps) {
 
   async function handleDelete() {
     setDeleting(true)
-    const { error: deleteError } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', product!.id)
-    if (deleteError) { setError('Erreur suppression : ' + deleteError.message); setDeleting(false); return }
-    router.push('/admin/produits')
-    router.refresh()
+    try {
+      await deleteProduct(product!.id)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur suppression')
+      setDeleting(false)
+    }
   }
 
   return (
