@@ -2,6 +2,7 @@
 
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export async function deleteProduct(productId: string) {
   const supabase = createServerClient()
@@ -12,6 +13,8 @@ export async function deleteProduct(productId: string) {
 
   if (error) throw new Error('Erreur suppression : ' + error.message)
 
+  revalidatePath('/boutique')
+  revalidatePath('/')
   redirect('/admin/produits')
 }
 
@@ -69,6 +72,8 @@ export async function createProduct(payload: ProductPayload) {
 
   if (error) throw new Error('Erreur : ' + error.message)
 
+  revalidatePath('/boutique')
+  revalidatePath('/')
   redirect('/admin/produits')
 }
 
@@ -94,4 +99,8 @@ export async function updateProduct(productId: string, payload: ProductPayload) 
     .eq('id', productId)
 
   if (error) throw new Error('Erreur : ' + error.message)
+
+  revalidatePath('/boutique')
+  revalidatePath('/')
+  revalidatePath(`/boutique`, 'layout')
 }
