@@ -81,6 +81,19 @@ export async function createProduct(payload: ProductPayload) {
   redirect('/admin/produits')
 }
 
+export async function updateStock(productId: string, stock: number) {
+  const supabase = createServerClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ stock } as never)
+    .eq('id', productId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/admin/produits')
+  revalidatePath('/admin')
+}
+
 export async function updateProduct(productId: string, payload: ProductPayload) {
   const supabase = createServerClient()
   const catId = await resolveCategoryId(supabase, payload.categorySlug)

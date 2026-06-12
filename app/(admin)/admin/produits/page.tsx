@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { PlusCircle, ArrowLeft, Edit } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 import { formatPrice } from '@/lib/formatPrice'
+import { QuickStockEdit } from '@/components/admin/QuickStockEdit'
 import type { Product } from '@/lib/supabase/types'
 
 async function getProducts(): Promise<Product[]> {
@@ -66,9 +67,7 @@ export default async function AdminProduitsPage() {
                 }`}>
                   {product.is_active ? 'Actif' : 'Inactif'}
                 </span>
-                <span className="font-sans text-xs text-on-surface-variant">
-                  Stock : {product.stock}
-                </span>
+                <QuickStockEdit productId={product.id} initialStock={product.stock} />
               </div>
             </div>
             <Link

@@ -1,0 +1,76 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { X } from 'lucide-react'
+import type { PromoConfig } from '@/app/(admin)/admin/popup/actions'
+
+const SESSION_KEY = 'mlk_popup_seen'
+
+export function PromoPopup({ config }: { config: PromoConfig }) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if (!config.active) return
+    const seen = sessionStorage.getItem(SESSION_KEY)
+    if (!seen) {
+      const t = setTimeout(() => setVisible(true), 1200)
+      return () => clearTimeout(t)
+    }
+  }, [config.active])
+
+  function dismiss() {
+    sessionStorage.setItem(SESSION_KEY, '1')
+    setVisible(false)
+  }
+
+  if (!visible) return null
+
+  const content = (
+    <div className="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-sm mx-auto overflow-hidden">
+      {config.imageUrl && (
+        <div className="w-full h-40 bg-surface-rose overflow-hidden">
+          <img src={config.imageUrl} alt="" className="w-full h-full object-cover" />
+        </div>
+      )}
+      <div className="p-5">
+        <p className="font-serif text-xl text-on-surface mb-2">{config.title}</p>
+        {config.message && (
+          <p className="font-sans text-sm text-on-surface-variant leading-relaxed mb-4">{config.message}</p>
+        )}
+        {config.buttonText && config.buttonLink && (
+          <Link
+            href={config.buttonLink}
+            onClick={dismiss}
+            className="block w-full rounded-xl bg-primary text-white text-center py-3 font-sans font-semibold text-sm hover:bg-primary-container transition-colors"
+          >
+            {config.buttonText}
+          </Link>
+        )}
+        <button
+          onClick={dismiss}
+          className="w-full mt-2 py-2 font-sans text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+        >
+          Non merci
+        </button>
+      </div>
+    </div>
+  )
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+      onClick={dismiss}
+    >
+      <div onClick={e => e.stopPropagation()} className="relative w-full max-w-sm">
+        <button
+          onClick={dismiss}
+          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow"
+        >
+          <X size={15} className="text-on-surface" />
+        </button>
+        {content}
+      </div>
+    </div>
+  )
+}

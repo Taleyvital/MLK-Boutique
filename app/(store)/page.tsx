@@ -5,6 +5,7 @@ import { CategoryPills } from '@/components/store/CategoryPills'
 import { PromoStrip } from '@/components/store/PromoStrip'
 import { ProductGrid } from '@/components/store/ProductGrid'
 import { createServerClient } from '@/lib/supabase/server'
+import { getHeroSlides } from '@/app/(admin)/admin/hero/actions'
 import type { Product } from '@/lib/supabase/types'
 
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -24,11 +25,14 @@ async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts()
+  const [featured, heroSlides] = await Promise.all([
+    getFeaturedProducts(),
+    getHeroSlides(),
+  ])
 
   return (
     <div className="bg-surface">
-      <HeroBanner />
+      <HeroBanner slides={heroSlides} />
 
       <section className="pt-8 pb-2">
         <p className="font-sans text-xs text-on-surface-variant tracking-widest uppercase px-6 mb-3">

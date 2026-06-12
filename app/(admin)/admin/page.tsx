@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Package, ShoppingCart, TrendingUp, PlusCircle } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, PlusCircle, Image as ImageIcon, Megaphone } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 
 async function getStats() {
@@ -77,6 +77,20 @@ export default async function AdminDashboard() {
         >
           <TrendingUp size={20} className="text-primary" strokeWidth={1.5} />
           <span className="font-sans font-semibold text-on-surface">Voir les commandes</span>
+        </Link>
+        <Link
+          href="/admin/hero"
+          className="flex items-center gap-3 bg-surface rounded-xl p-4 shadow-brand hover:bg-surface-rose transition-colors"
+        >
+          <ImageIcon size={20} className="text-primary" strokeWidth={1.5} />
+          <span className="font-sans font-semibold text-on-surface">Modifier le hero</span>
+        </Link>
+        <Link
+          href="/admin/popup"
+          className="flex items-center gap-3 bg-surface rounded-xl p-4 shadow-brand hover:bg-surface-rose transition-colors"
+        >
+          <Megaphone size={20} className="text-primary" strokeWidth={1.5} />
+          <span className="font-sans font-semibold text-on-surface">Popup promotionnel</span>
         </Link>
       </div>
 
