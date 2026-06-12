@@ -1,20 +1,24 @@
-export function PromoStrip() {
-  const items = [
-    { icon: '🚚', text: 'Livraison Abidjan' },
-    { icon: '📱', text: 'Mobile Money' },
-    { icon: '💬', text: 'WhatsApp' },
-  ]
+'use client'
+
+import type { StripItem } from '@/app/(admin)/admin/strip/actions'
+
+export function PromoStrip({ items }: { items: StripItem[] }) {
+  if (!items.length) return null
+
+  // Dupliquer les items pour créer un défilement sans rupture
+  const doubled = [...items, ...items]
 
   return (
-    <div className="bg-secondary-container">
-      <div className="flex items-center justify-around px-6 py-3">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-1.5">
+    <div className="bg-secondary-container overflow-hidden">
+      <div className="flex animate-ticker py-2.5">
+        {doubled.map((item, i) => (
+          <span
+            key={i}
+            className="flex items-center gap-2 font-sans text-xs font-medium text-primary whitespace-nowrap px-8"
+          >
             <span className="text-base">{item.icon}</span>
-            <span className="font-sans text-xs font-medium text-primary whitespace-nowrap">
-              {item.text}
-            </span>
-          </div>
+            <span>{item.text}</span>
+          </span>
         ))}
       </div>
     </div>

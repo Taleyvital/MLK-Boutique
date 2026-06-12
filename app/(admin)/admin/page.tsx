@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Package, ShoppingCart, TrendingUp, PlusCircle, Image as ImageIcon, Megaphone } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, PlusCircle, Image as ImageIcon, Megaphone, AlignJustify } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 
 async function getStats() {
@@ -91,6 +91,13 @@ export default async function AdminDashboard() {
         >
           <Megaphone size={20} className="text-primary" strokeWidth={1.5} />
           <span className="font-sans font-semibold text-on-surface">Popup promotionnel</span>
+        </Link>
+        <Link
+          href="/admin/strip"
+          className="flex items-center gap-3 bg-surface rounded-xl p-4 shadow-brand hover:bg-surface-rose transition-colors"
+        >
+          <AlignJustify size={20} className="text-primary" strokeWidth={1.5} />
+          <span className="font-sans font-semibold text-on-surface">Bandeau défilant</span>
         </Link>
       </div>
 

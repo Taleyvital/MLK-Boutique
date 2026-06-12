@@ -6,6 +6,7 @@ import { PromoStrip } from '@/components/store/PromoStrip'
 import { ProductGrid } from '@/components/store/ProductGrid'
 import { createServerClient } from '@/lib/supabase/server'
 import { getHeroSlides } from '@/app/(admin)/admin/hero/actions'
+import { getStripItems } from '@/app/(admin)/admin/strip/actions'
 import type { Product } from '@/lib/supabase/types'
 
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -25,9 +26,10 @@ async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export default async function HomePage() {
-  const [featured, heroSlides] = await Promise.all([
+  const [featured, heroSlides, stripItems] = await Promise.all([
     getFeaturedProducts(),
     getHeroSlides(),
+    getStripItems(),
   ])
 
   return (
@@ -42,7 +44,7 @@ export default async function HomePage() {
       </section>
 
       <section className="py-4">
-        <PromoStrip />
+        <PromoStrip items={stripItems} />
       </section>
 
       <section className="pt-8 pb-6">
