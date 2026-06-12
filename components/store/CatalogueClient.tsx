@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LayoutGrid, Shirt, Gem, Sparkles, Footprints, ArrowUpNarrowWide, ArrowDownNarrowWide } from 'lucide-react'
 import { ProductGrid } from '@/components/store/ProductGrid'
 import { cn } from '@/lib/utils'
@@ -19,13 +19,17 @@ const FILTERS = [
 export function CatalogueClient({
   products,
   categoryMap,
-  initialCategory,
 }: {
   products: Product[]
   categoryMap: Record<string, string>
-  initialCategory?: string
 }) {
-  const [activeFilter, setActiveFilter] = useState(initialCategory ?? 'tout')
+  const [activeFilter, setActiveFilter] = useState('tout')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const cat = params.get('cat')
+    if (cat) setActiveFilter(cat)
+  }, [])
 
   const filtered = products
     .filter((p) => {
