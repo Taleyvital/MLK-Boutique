@@ -55,7 +55,6 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
   }
 
   function handleSave() {
-    if (form.active && !form.title) { setError('Le titre est obligatoire quand le popup est actif.'); return }
     setError('')
     startTransition(async () => {
       const result = await savePromoPopup(form)
@@ -83,22 +82,6 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
             <div className={`w-5 h-5 bg-white rounded-full mt-1 transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
           </div>
         </label>
-      </div>
-
-      {/* Titre */}
-      <div>
-        <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Titre <span className="text-primary">*</span></label>
-        <input name="title" value={form.title} onChange={handleChange}
-          placeholder="ex : 🎉 Offre spéciale -20%"
-          className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none" />
-      </div>
-
-      {/* Message */}
-      <div>
-        <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Message</label>
-        <textarea name="message" value={form.message} onChange={handleChange} rows={3}
-          placeholder="ex : Profitez de -20% sur toute la collection bijoux ce weekend !"
-          className="w-full px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:outline-none resize-none" />
       </div>
 
       {/* Flyer / Image */}
@@ -164,7 +147,7 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
       </div>
 
       {/* Preview */}
-      {(form.title || form.message) && (
+      {(form.imageUrl || form.buttonText) && (
         <div className="border-2 border-dashed border-secondary-container rounded-xl p-4">
           <p className="font-sans text-xs text-on-surface-variant uppercase tracking-widest mb-3">Aperçu</p>
           <div className="bg-white rounded-2xl p-5 shadow-brand max-w-xs mx-auto">
@@ -173,8 +156,6 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
                 <img src={form.imageUrl} alt="" className="w-full h-full object-cover" />
               </div>
             )}
-            <p className="font-serif text-lg text-on-surface mb-1">{form.title || 'Titre'}</p>
-            {form.message && <p className="font-sans text-sm text-on-surface-variant mb-3">{form.message}</p>}
             {form.buttonText && (
               <div className="w-full rounded-xl bg-primary text-white text-center py-2.5 font-sans text-sm font-semibold">
                 {form.buttonText}

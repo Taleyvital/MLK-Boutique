@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Package, ShoppingCart, TrendingUp, PlusCircle, Image as ImageIcon, Megaphone, AlignJustify } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
+import { logout } from './login/actions'
 
 async function getStats() {
   try {
@@ -31,12 +32,22 @@ export default async function AdminDashboard() {
           <h1 className="font-display italic text-2xl text-primary">MLK-Boutique</h1>
           <p className="font-sans text-sm text-on-surface-variant">Tableau de bord admin</p>
         </div>
-        <Link
-          href="/"
-          className="font-sans text-sm text-on-surface-variant hover:text-on-surface transition-colors"
-        >
-          ← Voir la boutique
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="font-sans text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+          >
+            ← Voir la boutique
+          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="font-sans text-sm text-primary hover:underline"
+            >
+              Déconnexion
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-8">
