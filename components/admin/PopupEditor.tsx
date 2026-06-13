@@ -56,6 +56,10 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
   }
 
   function handleSave() {
+    if (form.active && !form.imageUrl && !form.buttonText) {
+      setError('Ajoutez au moins une image ou un bouton quand le popup est actif.')
+      return
+    }
     setError('')
     startTransition(async () => {
       // Titre/message retirés de l'éditeur : on les vide pour nettoyer les anciennes valeurs

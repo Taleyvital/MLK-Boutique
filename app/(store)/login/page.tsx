@@ -9,7 +9,11 @@ import { useAuth } from '@/hooks/useAuth'
 function LoginForm() {
   const router = useRouter()
   const params = useSearchParams()
-  const redirect = params.get('redirect') || '/compte'
+  // Anti open-redirect : on n'accepte qu'un chemin interne ('/x'), jamais une URL externe ('//', 'https://')
+  const rawRedirect = params.get('redirect')
+  const redirect = rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+    ? rawRedirect
+    : '/compte'
   const { user, signIn, signUp } = useAuth()
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')

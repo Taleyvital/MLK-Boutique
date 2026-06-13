@@ -17,7 +17,7 @@ import type { Product } from '@/lib/supabase/types'
 export function ProductPageContent({ product }: { product: Product }) {
   const router = useRouter()
   const { addItem } = useCart()
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const { triggerFly } = useCartAnim()
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -28,6 +28,9 @@ export function ProductPageContent({ product }: { product: Product }) {
 
   function handleAddToCart() {
     if (!selectedSize && product.sizes.length > 0) return
+
+    // Session pas encore chargée : on ne fait rien (évite de rediriger un connecté par erreur)
+    if (loading) return
 
     // Connexion requise pour ajouter au panier (mode invité : navigation libre)
     if (!user) {

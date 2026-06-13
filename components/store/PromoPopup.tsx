@@ -41,12 +41,12 @@ export function PromoPopup({ config }: { config: PromoConfig }) {
 
   const content = flyerOnly ? (
     <div className="relative rounded-2xl overflow-hidden shadow-2xl w-[90vw] max-w-sm mx-auto">
-      <img src={config.imageUrl} alt="Promo" className="w-full object-contain" />
+      <img src={config.imageUrl} alt="Promo" className="w-full object-contain max-h-[80vh]" />
     </div>
   ) : (
-    <div className="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-sm mx-auto overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-sm mx-auto overflow-hidden max-h-[90vh] flex flex-col">
       {config.imageUrl && (
-        <img src={config.imageUrl} alt="" className="block w-full object-contain" />
+        <img src={config.imageUrl} alt="" className="block w-full object-contain min-h-0 max-h-[75vh]" />
       )}
       {config.buttonText && config.buttonLink && (
         <div className="p-3">

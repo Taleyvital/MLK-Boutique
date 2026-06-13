@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Badge } from './Badge'
 import { formatPrice } from '@/lib/formatPrice'
@@ -37,11 +37,10 @@ export function ProductCard({
   className,
 }: ProductCardProps) {
   const router = useRouter()
-  const pathname = usePathname()
   const imageRef = useRef<HTMLDivElement>(null)
   const { triggerFly } = useCartAnim()
   const { addItem } = useCart()
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault()
@@ -53,9 +52,13 @@ export function ProductCard({
       return
     }
 
+    // Session pas encore chargée : on ne fait rien (évite de rediriger un connecté par erreur)
+    if (loading) return
+
     // Connexion requise pour ajouter au panier (mode invité : navigation libre)
     if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`)
+      const here = window.location.pathname + window.location.search
+      router.push(`/login?redirect=${encodeURIComponent(here)}`)
       return
     }
 
