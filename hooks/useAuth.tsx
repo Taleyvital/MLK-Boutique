@@ -47,7 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signUp(email: string, password: string) {
-    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password })
+    // Redirige le lien de confirmation vers le site réel (prod ou local), pas le localhost figé de Supabase
+    const emailRedirectTo =
+      typeof window !== 'undefined' ? `${window.location.origin}/compte` : undefined
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: { emailRedirectTo },
+    })
     if (error) return { error: translateError(error.message) }
     // Pas de session = confirmation par email requise (réglage Supabase)
     return { needsConfirm: !data.session }
