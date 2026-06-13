@@ -3,12 +3,13 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Badge } from './Badge'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCartAnim } from '@/components/ui/CartFlyAnimation'
 import { useCart } from '@/hooks/useCart'
+import { useAuth } from '@/hooks/useAuth'
 
 interface ProductCardProps {
   id: string
@@ -36,9 +37,11 @@ export function ProductCard({
   className,
 }: ProductCardProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const imageRef = useRef<HTMLDivElement>(null)
   const { triggerFly } = useCartAnim()
   const { addItem } = useCart()
+  const { user } = useAuth()
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault()
@@ -47,6 +50,12 @@ export function ProductCard({
     // Si le produit a des tailles, on navigue vers la fiche
     if (sizes.length > 1) {
       router.push(`/boutique/${slug}`)
+      return
+    }
+
+    // Connexion requise pour ajouter au panier (mode invité : navigation libre)
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`)
       return
     }
 

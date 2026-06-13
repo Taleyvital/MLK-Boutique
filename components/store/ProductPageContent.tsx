@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Heart, ShoppingBag, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCart } from '@/hooks/useCart'
+import { useAuth } from '@/hooks/useAuth'
 import { useCartAnim } from '@/components/ui/CartFlyAnimation'
 import { SizeChip } from '@/components/ui/SizeChip'
 import { Button } from '@/components/ui/Button'
@@ -16,6 +17,7 @@ import type { Product } from '@/lib/supabase/types'
 export function ProductPageContent({ product }: { product: Product }) {
   const router = useRouter()
   const { addItem } = useCart()
+  const { user } = useAuth()
   const { triggerFly } = useCartAnim()
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -26,6 +28,12 @@ export function ProductPageContent({ product }: { product: Product }) {
 
   function handleAddToCart() {
     if (!selectedSize && product.sizes.length > 0) return
+
+    // Connexion requise pour ajouter au panier (mode invité : navigation libre)
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(`/boutique/${product.slug}`)}`)
+      return
+    }
 
     if (imageRef.current) {
       triggerFly(images[currentImageIndex], imageRef.current)

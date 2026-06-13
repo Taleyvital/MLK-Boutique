@@ -5,11 +5,12 @@ import Image from 'next/image'
 import {
   User, Phone, MapPin, Package, ChevronRight,
   MessageCircle, Edit2, Check, X, ShoppingBag,
-  Clock, Truck, Ban, Star, LayoutDashboard
+  Clock, Truck, Ban, Star, LayoutDashboard, LogOut, LogIn
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/formatPrice'
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp'
+import { useAuth } from '@/hooks/useAuth'
 import type { Order } from '@/lib/supabase/types'
 import Link from 'next/link'
 
@@ -44,6 +45,7 @@ const STATUS_CONFIG = {
 
 /* ── Main page ───────────────────────────────────────────────── */
 export default function ComptePage() {
+  const { user, signOut } = useAuth()
   const [mounted, setMounted] = useState(false)
   const [profile, setProfile] = useState<Profile>({ name: '', phone: '', address: '' })
   const [editing, setEditing] = useState(false)
@@ -119,12 +121,31 @@ export default function ComptePage() {
         </div>
         <div className="text-center">
           <p className="font-serif text-xl text-on-surface">
-            {profile.name || 'Invitée'}
+            {profile.name || (user ? 'Mon compte' : 'Invitée')}
           </p>
-          {profile.phone && (
+          {user ? (
+            <p className="font-sans text-sm text-on-surface-variant mt-0.5">{user.email}</p>
+          ) : profile.phone ? (
             <p className="font-sans text-sm text-on-surface-variant mt-0.5">{profile.phone}</p>
-          )}
+          ) : null}
         </div>
+
+        {/* Connexion / Déconnexion */}
+        {user ? (
+          <button
+            onClick={() => signOut()}
+            className="flex items-center gap-2 mt-1 px-4 py-2 rounded-full bg-white shadow-brand font-sans text-sm font-medium text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <LogOut size={15} strokeWidth={1.6} /> Se déconnecter
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="flex items-center gap-2 mt-1 px-5 py-2.5 rounded-full bg-primary text-white shadow-brand font-sans text-sm font-semibold hover:bg-primary-container transition-colors"
+          >
+            <LogIn size={15} strokeWidth={1.8} /> Se connecter / Créer un compte
+          </Link>
+        )}
       </div>
 
       <div className="px-4 space-y-4 mt-4">
