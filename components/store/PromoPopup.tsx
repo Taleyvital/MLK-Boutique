@@ -26,8 +26,8 @@ export function PromoPopup({ config }: { config: PromoConfig }) {
 
   if (!visible) return null
 
-  // Mode flyer : image seule sans texte par-dessus
-  const flyerOnly = !!config.imageUrl && !config.title && !config.message && !config.buttonText
+  // Mode flyer : image seule, sans bouton
+  const flyerOnly = !!config.imageUrl && !config.buttonText
 
   const content = flyerOnly ? (
     <div className="relative rounded-2xl overflow-hidden shadow-2xl w-[90vw] max-w-sm mx-auto">
@@ -41,10 +41,6 @@ export function PromoPopup({ config }: { config: PromoConfig }) {
         </div>
       )}
       <div className="p-5">
-        {config.title && <p className="font-serif text-xl text-on-surface mb-2">{config.title}</p>}
-        {config.message && (
-          <p className="font-sans text-sm text-on-surface-variant leading-relaxed mb-4">{config.message}</p>
-        )}
         {config.buttonText && config.buttonLink && (
           <Link
             href={config.buttonLink}

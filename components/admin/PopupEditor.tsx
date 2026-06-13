@@ -57,7 +57,8 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
   function handleSave() {
     setError('')
     startTransition(async () => {
-      const result = await savePromoPopup(form)
+      // Titre/message retirés de l'éditeur : on les vide pour nettoyer les anciennes valeurs
+      const result = await savePromoPopup({ ...form, title: '', message: '' })
       if (result.success) {
         setSuccess(true)
         setTimeout(() => setSuccess(false), 2500)
