@@ -25,6 +25,7 @@ const EMPTY: PromoConfig = {
   buttonText: '',
   buttonLink: '',
   imageUrl: '',
+  displayDuration: 0,
 }
 
 export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | null }) {
@@ -83,6 +84,26 @@ export function PopupEditor({ initialConfig }: { initialConfig: PromoConfig | nu
             <div className={`w-5 h-5 bg-white rounded-full mt-1 transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
           </div>
         </label>
+      </div>
+
+      {/* Durée d'affichage */}
+      <div>
+        <label className="font-sans text-sm font-semibold text-on-surface block mb-1.5">Durée d'affichage</label>
+        <div className="flex items-center gap-3">
+          <input
+            type="number"
+            name="displayDuration"
+            min={0}
+            max={120}
+            value={form.displayDuration ?? 0}
+            onChange={e => setForm(f => ({ ...f, displayDuration: Math.max(0, Number(e.target.value) || 0) }))}
+            className="w-24 px-4 py-3 bg-surface-rose rounded-xl font-sans text-sm text-on-surface border border-transparent focus:border-primary focus:outline-none"
+          />
+          <span className="font-sans text-sm text-on-surface-variant">secondes</span>
+        </div>
+        <p className="font-sans text-xs text-on-surface-variant mt-1.5">
+          Le popup se ferme tout seul après ce délai. Mettez <strong>0</strong> pour qu'il reste jusqu'à fermeture manuelle.
+        </p>
       </div>
 
       {/* Flyer / Image */}

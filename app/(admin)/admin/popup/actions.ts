@@ -10,6 +10,8 @@ export interface PromoConfig {
   buttonText: string
   buttonLink: string
   imageUrl: string
+  /** Durée d'affichage avant fermeture auto, en secondes. 0 = jusqu'à fermeture manuelle. */
+  displayDuration?: number
 }
 
 const STORAGE_PATH = 'settings/promo_popup.json'

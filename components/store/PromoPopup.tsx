@@ -24,6 +24,16 @@ export function PromoPopup({ config }: { config: PromoConfig }) {
     setVisible(false)
   }
 
+  // Fermeture automatique après la durée d'affichage configurée (0 = jamais)
+  useEffect(() => {
+    if (!visible) return
+    const secs = config.displayDuration ?? 0
+    if (secs > 0) {
+      const t = setTimeout(() => dismiss(), secs * 1000)
+      return () => clearTimeout(t)
+    }
+  }, [visible, config.displayDuration])
+
   if (!visible) return null
 
   // Mode flyer : image seule, sans bouton
@@ -36,27 +46,19 @@ export function PromoPopup({ config }: { config: PromoConfig }) {
   ) : (
     <div className="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-sm mx-auto overflow-hidden">
       {config.imageUrl && (
-        <div className="w-full overflow-hidden bg-surface-rose">
-          <img src={config.imageUrl} alt="" className="w-full object-contain max-h-56" />
-        </div>
+        <img src={config.imageUrl} alt="" className="block w-full object-contain" />
       )}
-      <div className="p-5">
-        {config.buttonText && config.buttonLink && (
+      {config.buttonText && config.buttonLink && (
+        <div className="p-3">
           <Link
             href={config.buttonLink}
             onClick={dismiss}
-            className="block w-full rounded-xl bg-primary text-white text-center py-3 font-sans font-semibold text-sm hover:bg-primary-container transition-colors"
+            className="block w-full rounded-xl bg-primary text-white text-center py-3.5 font-sans font-semibold text-sm hover:bg-primary-container transition-colors"
           >
             {config.buttonText}
           </Link>
-        )}
-        <button
-          onClick={dismiss}
-          className="w-full mt-2 py-2 font-sans text-sm text-on-surface-variant hover:text-on-surface transition-colors"
-        >
-          Non merci
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   )
 
