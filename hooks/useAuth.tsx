@@ -22,6 +22,9 @@ function translateError(message: string): string {
   if (m.includes('password should be at least')) return 'Le mot de passe doit contenir au moins 6 caractères.'
   if (m.includes('unable to validate email') || m.includes('invalid email')) return 'Adresse email invalide.'
   if (m.includes('email not confirmed')) return 'Confirme ton email avant de te connecter.'
+  if (m.includes('rate limit') || m.includes('over_email_send_rate_limit')) {
+    return 'Trop d\'emails envoyés récemment (limite Supabase). Attends 1 heure, connecte-toi si ton compte existe déjà, ou active ALLOW_DIRECT_SIGNUP=true en local.'
+  }
   return message
 }
 
@@ -47,11 +50,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signUp(email: string, password: string) {
-    // Redirige le lien de confirmation vers le site réel (prod ou local), pas le localhost figé de Supabase
-    const emailRedirectTo =
-      typeof window !== 'undefined' ? `${window.location.origin}/compte` : undefined
+    const trimmedEmail = email.trim()
+
+    // Dev : contourne l'envoi d'email Supabase (limite ~6/h)
+    if (process.env.NEXT_PUBLIC_ALLOW_DIRECT_SIGNUP === 'true') {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmedEmail, password }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) return { error: translateError(data.error ?? 'Inscription impossible.') }
+      return signIn(trimmedEmail, password)
+    }
+
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : '')
+    const emailRedirectTo = siteUrl
+      ? `${siteUrl}/auth/callback?next=/compte`
+      : undefined
     const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
+      email: trimmedEmail,
       password,
       options: { emailRedirectTo },
     })
