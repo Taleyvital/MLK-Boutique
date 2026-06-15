@@ -55,12 +55,20 @@ export default function ComptePage() {
   const [ordersLoading, setOrdersLoading] = useState(false)
   const [ordersSearched, setOrdersSearched] = useState(false)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const p = loadProfile()
     setProfile(p)
     setDraft(p)
     setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/admin/session')
+      .then((r) => r.json())
+      .then((data: { isAdmin?: boolean }) => setIsAdmin(Boolean(data.isAdmin)))
+      .catch(() => setIsAdmin(false))
   }, [])
 
   function startEdit() {
@@ -328,19 +336,21 @@ export default function ComptePage() {
         </section>
 
         {/* ── Gestion stock (admin) ── */}
-        <Link
-          href="/admin"
-          className="flex items-center gap-4 bg-primary rounded-2xl px-5 py-4 hover:bg-primary-container transition-colors"
-        >
-          <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
-            <LayoutDashboard size={18} className="text-white" strokeWidth={1.5} />
-          </div>
-          <div className="flex-1">
-            <p className="font-sans font-semibold text-sm text-white">Gestion stock</p>
-            <p className="font-sans text-xs text-white/70">Produits · Commandes · Dashboard</p>
-          </div>
-          <ChevronRight size={16} className="text-white/60" strokeWidth={1.5} />
-        </Link>
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center gap-4 bg-primary rounded-2xl px-5 py-4 hover:bg-primary-container transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+              <LayoutDashboard size={18} className="text-white" strokeWidth={1.5} />
+            </div>
+            <div className="flex-1">
+              <p className="font-sans font-semibold text-sm text-white">Gestion stock</p>
+              <p className="font-sans text-xs text-white/70">Produits · Commandes · Dashboard</p>
+            </div>
+            <ChevronRight size={16} className="text-white/60" strokeWidth={1.5} />
+          </Link>
+        )}
 
         {/* ── Contact & liens utiles ── */}
         <section className="bg-white rounded-2xl shadow-brand overflow-hidden">
