@@ -5,7 +5,7 @@ import Image from 'next/image'
 import {
   User, Phone, MapPin, Package, ChevronRight,
   MessageCircle, Edit2, Check, X, ShoppingBag,
-  Clock, Truck, Ban, Star, LayoutDashboard, LogOut, LogIn
+  Clock, Truck, Ban, Star, LayoutDashboard, LogOut, LogIn, ShieldCheck
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/formatPrice'
@@ -335,22 +335,34 @@ export default function ComptePage() {
           )}
         </section>
 
-        {/* ── Gestion stock (admin) ── */}
-        {isAdmin && (
-          <Link
-            href="/admin"
-            className="flex items-center gap-4 bg-primary rounded-2xl px-5 py-4 hover:bg-primary-container transition-colors"
-          >
-            <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+        {/* ── Espace admin ── */}
+        <Link
+          href={isAdmin ? '/admin' : '/admin/login'}
+          className={`flex items-center gap-4 rounded-2xl px-5 py-4 transition-colors ${
+            isAdmin
+              ? 'bg-primary hover:bg-primary-container'
+              : 'bg-white shadow-brand hover:bg-surface-rose'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+            isAdmin ? 'bg-white/15' : 'bg-primary/10'
+          }`}>
+            {isAdmin ? (
               <LayoutDashboard size={18} className="text-white" strokeWidth={1.5} />
-            </div>
-            <div className="flex-1">
-              <p className="font-sans font-semibold text-sm text-white">Gestion stock</p>
-              <p className="font-sans text-xs text-white/70">Produits · Commandes · Dashboard</p>
-            </div>
-            <ChevronRight size={16} className="text-white/60" strokeWidth={1.5} />
-          </Link>
-        )}
+            ) : (
+              <ShieldCheck size={18} className="text-primary" strokeWidth={1.5} />
+            )}
+          </div>
+          <div className="flex-1">
+            <p className={`font-sans font-semibold text-sm ${isAdmin ? 'text-white' : 'text-on-surface'}`}>
+              {isAdmin ? 'Gestion stock' : 'Espace admin'}
+            </p>
+            <p className={`font-sans text-xs ${isAdmin ? 'text-white/70' : 'text-on-surface-variant'}`}>
+              {isAdmin ? 'Produits · Commandes · Dashboard' : 'Connexion gestion boutique'}
+            </p>
+          </div>
+          <ChevronRight size={16} className={isAdmin ? 'text-white/60' : 'text-outline'} strokeWidth={1.5} />
+        </Link>
 
         {/* ── Contact & liens utiles ── */}
         <section className="bg-white rounded-2xl shadow-brand overflow-hidden">

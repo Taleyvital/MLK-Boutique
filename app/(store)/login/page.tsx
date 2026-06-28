@@ -158,6 +158,13 @@ function LoginForm() {
       >
         Continuer en invité →
       </Link>
+
+      <Link
+        href="/admin/login"
+        className="block text-center mt-3 font-sans text-sm font-semibold text-primary hover:underline"
+      >
+        Espace admin
+      </Link>
     </div>
   )
 }
