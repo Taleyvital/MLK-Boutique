@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { loginAsAdmin } from './actions'
 
 function LoginForm() {
   const router = useRouter()
@@ -35,6 +36,18 @@ function LoginForm() {
     setPending(true)
 
     if (mode === 'signin') {
+      const admin = await loginAsAdmin(email, password)
+      if (admin.ok) {
+        router.replace('/compte')
+        router.refresh()
+        return
+      }
+      if (!email.includes('@')) {
+        setError('Identifiant ou mot de passe incorrect.')
+        setPending(false)
+        return
+      }
+
       const { error } = await signIn(email, password)
       if (error) { setError(error); setPending(false); return }
       router.replace(redirect)
@@ -103,12 +116,12 @@ function LoginForm() {
         <div className="relative">
           <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-outline" strokeWidth={1.6} />
           <input
-            type="email"
+            type={mode === 'signin' ? 'text' : 'email'}
             required
-            autoComplete="email"
+            autoComplete={mode === 'signin' ? 'username' : 'email'}
             value={email}
             onChange={e => setEmail(e.target.value)}
-            placeholder="Adresse email"
+            placeholder={mode === 'signin' ? 'Email ou identifiant' : 'Adresse email'}
             className="w-full pl-11 pr-4 py-3.5 bg-surface-low rounded-2xl font-sans text-sm text-on-surface placeholder-outline border border-transparent focus:border-primary focus:bg-white focus:outline-none transition-colors"
           />
         </div>
@@ -159,12 +172,6 @@ function LoginForm() {
         Continuer en invité →
       </Link>
 
-      <Link
-        href="/admin/login"
-        className="block text-center mt-3 font-sans text-sm font-semibold text-primary hover:underline"
-      >
-        Espace admin
-      </Link>
     </div>
   )
 }
