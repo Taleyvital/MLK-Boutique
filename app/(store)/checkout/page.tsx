@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase/client'
 import type { CartItem } from '@/store/cartStore'
 
 
-const BOUTIQUE_WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+2250141330444').replace(/\D/g, '')
+const BOUTIQUE_WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+2250153471556').replace(/\D/g, '')
 
 function buildOwnerNotification(orderId: string, name: string, phone: string, address: string, items: CartItem[], total: number) {
   const lines = items.map(i => `• ${i.name} (${i.size}) ×${i.qty} — ${formatPrice(i.price * i.qty)}`).join('\n')

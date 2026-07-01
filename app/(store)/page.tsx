@@ -86,7 +86,7 @@ export default async function HomePage() {
             Suivez-nous sur WhatsApp pour ne rien manquer
           </p>
           <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\+/g, '') || '2250700000000'}`}
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\+/g, '') || '2250153471556'}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-primary rounded-full px-6 py-2.5 font-sans font-semibold text-sm hover:bg-surface transition-colors"

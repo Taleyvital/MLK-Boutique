@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { formatPrice } from '@/lib/formatPrice'
 import { getWhatsAppUrl } from '@/lib/whatsapp'
+import { loadCustomerInfo, publicImageUrl } from '@/lib/customerProfile'
 import type { Product } from '@/lib/supabase/types'
 
 export function ProductPageContent({ product }: { product: Product }) {
@@ -57,10 +58,12 @@ export function ProductPageContent({ product }: { product: Product }) {
   }
 
   function handleWhatsApp() {
+    const customerInfo = loadCustomerInfo()
+    const image = publicImageUrl(images[currentImageIndex])
     const url = getWhatsAppUrl(
-      [{ id: product.id, name: product.name, price: product.price, image: images[0], size: selectedSize || 'Unique', qty: 1, slug: product.slug }],
+      [{ id: product.id, name: product.name, price: product.price, image, size: selectedSize || 'Unique', qty: 1, slug: product.slug }],
       product.price,
-      { name: '', address: 'Abidjan' }
+      { name: customerInfo.name || 'Non renseigné', address: customerInfo.address }
     )
     window.open(url, '_blank')
   }

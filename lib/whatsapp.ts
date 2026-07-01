@@ -1,6 +1,6 @@
 import { formatPrice } from './formatPrice'
 
-export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+2250700000000'
+export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+2250153471556'
 
 export interface CartItem {
   id: string
@@ -18,7 +18,10 @@ export function generateWhatsAppMessage(
   customerInfo: { name: string; address: string }
 ): string {
   const itemsList = items
-    .map(i => `• ${i.name} (${i.size}) x${i.qty} — ${formatPrice(i.price * i.qty)}`)
+    .map((i) => {
+      const imageLine = i.image ? `\n  Image : ${i.image}` : ''
+      return `• ${i.name} (${i.size}) x${i.qty} — ${formatPrice(i.price * i.qty)}${imageLine}`
+    })
     .join('\n')
 
   return encodeURIComponent(

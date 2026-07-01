@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { useCart } from '@/hooks/useCart'
 import { getWhatsAppUrl } from '@/lib/whatsapp'
+import { loadCustomerInfo, publicImageUrl } from '@/lib/customerProfile'
 
 const MTN_ORANGE_LOGOS = [
   { name: 'MTN',    src: '/moyen-paiement/MTN-CI.jpg' },
@@ -31,7 +32,15 @@ export function CheckoutButtons() {
   })()
 
   function handleWhatsApp() {
-    const url = getWhatsAppUrl(items, total(), { name: '', address: 'Abidjan' })
+    const customerInfo = loadCustomerInfo()
+    const itemsWithPublicImages = items.map((item) => ({
+      ...item,
+      image: publicImageUrl(item.image),
+    }))
+    const url = getWhatsAppUrl(itemsWithPublicImages, total(), {
+      name: customerInfo.name || 'Non renseigné',
+      address: customerInfo.address,
+    })
     window.open(url, '_blank')
   }
 
